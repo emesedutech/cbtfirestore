@@ -1,32 +1,38 @@
 // pages/api/page.js
-// Equivalent to doGet() di GAS: serve HTML_ADMIN dan HTML_SISWA
-// APP_URL diganti dengan URL API endpoint yang benar
+// Serve HTML_ADMIN dan HTML_SISWA dengan APP_URL di-inject
 import { readFileSync } from 'fs'
 import path from 'path'
 
-// Import HTML strings dari file terpisah
-// Kita ekstrak HTML dari GAS dan simpan sebagai static files
 export default function handler(req, res) {
-  const page = req.query.page || 'login'
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || ''
-  const appUrl  = baseUrl + '/api/app'
+  const page   = req.query.page || ''
+  const appUrl = '/api/app'
 
-  // Baca file HTML dari public/html/
   const htmlDir = path.join(process.cwd(), 'public', 'html')
   let filename
-  if (page === 'admin')  filename = 'admin.html'
+  if (page === 'admin')      filename = 'admin.html'
   else if (page === 'siswa') filename = 'siswa.html'
-  else { res.redirect('/'); return }
+  else { res.redirect('/html/login.html'); return }
 
   try {
     let html = readFileSync(path.join(htmlDir, filename), 'utf-8')
-    // Inject APP_URL – identik dengan cara GAS inject APP_URL
+    // Inject APP_URL — identik dengan cara GAS inject APP_URL ke HTML
     html = html.replace(/'{{APP_URL}}'/g, "'" + appUrl + "'")
                .replace(/\{\{APP_URL\}\}/g, appUrl)
+               // Patch redirect logout ke login.html
+               .replace(/window\.location\.href\s*=\s*['"]\/['"]/g, "window.location.href='/html/login.html'")
+               .replace(/window\.location\.href\s*=\s*APP_URL\s*\+\s*['"]\?page=login['"]/g, "window.location.href='/html/login.html'")
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.setHeader('Cache-Control', 'no-cache')
     res.status(200).send(html)
   } catch(e) {
-    res.status(500).send('<h1>Error: HTML file not found</h1><p>Jalankan script extract-html.js terlebih dahulu.</p><pre>' + e.message + '</pre>')
+    res.status(500).send(`
+      <h2 style="font-family:sans-serif;color:#dc2626;padding:40px">
+        ⚠️ File HTML belum digenerate
+      </h2>
+      <p style="font-family:sans-serif;padding:0 40px">
+        Jalankan perintah berikut di terminal:<br><br>
+        <code>node scripts/extract-html.js path/to/EmesCBTApp_v5c_Sync.gs</code>
+      </p>
+    `)
   }
 }
