@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Izinkan gambar dari domain eksternal (imgur, drive, dll)
   images: {
-    domains: ['i.imgur.com', 'drive.google.com', 'lh3.googleusercontent.com'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'i.imgur.com' },
+      { protocol: 'https', hostname: 'drive.google.com' },
+      { protocol: 'https', hostname: 'storage.googleapis.com' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' }
+    ],
     unoptimized: true
   }
 }
