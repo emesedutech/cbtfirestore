@@ -10,7 +10,7 @@
     "extract-html": "node scripts/extract-html.js"
   },
   "dependencies": {
-    "next": "15.2.5",
+    "next": "15.2.6",
     "react": "^19",
     "react-dom": "^19",
     "firebase-admin": "^12.1.0",
@@ -21,6 +21,6 @@
   },
   "devDependencies": {
     "eslint": "^9",
-    "eslint-config-next": "15.2.5"
+    "eslint-config-next": "15.2.6"
   }
 }
